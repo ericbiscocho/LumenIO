@@ -16,6 +16,11 @@ class VersionSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['id', 'created_at', 'version_number']
 
+    def validate(self, attrs):
+        if 'version_number' in self.initial_data:
+            raise serializers.ValidationError({'version_number': 'Version number is auto-assigned.'})
+        return attrs
+
 
 class ShotSerializer(serializers.ModelSerializer):
     class Meta:

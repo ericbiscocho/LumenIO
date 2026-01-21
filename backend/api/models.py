@@ -69,11 +69,14 @@ class Task(models.Model):
 class Version(models.Model):
     STATUS_CHOICES = [
         ('approved', 'Approved'),
+        ('needs_changes', 'Needs Changes'),
         ('needs_review', 'Needs Review'),
+        ('pending', 'Pending'),
         ('rejected', 'Rejected'),
     ]
     shot = models.ForeignKey(Shot, related_name='versions', on_delete=models.CASCADE)
 
+    name = models.CharField(max_length=255)
     version_number = models.PositiveIntegerField(blank=True, null=True)
     file_path = models.FileField(upload_to='versions/')
     created_at = models.DateTimeField(auto_now_add=True)
