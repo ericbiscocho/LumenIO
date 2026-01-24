@@ -7,8 +7,14 @@ from .serializers import ProjectSerializer, ShotSerializer, TaskSerializer, Vers
 
 # Create your views here.
 class ProjectViewSet(viewsets.ModelViewSet):
-    queryset = Project.objects.all()
     serializer_class = ProjectSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Project.objects.filter(owner=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
 
 
 class ShotViewSet(viewsets.ModelViewSet):

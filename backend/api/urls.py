@@ -4,7 +4,7 @@ from .views import ProjectViewSet, ShotViewSet, TaskViewSet, VersionViewSet
 
 
 router = DefaultRouter()
-router.register(r'projects', ProjectViewSet)
+router.register(r'projects', ProjectViewSet, basename='project')
 router.register(r'shots', ShotViewSet)
 router.register(r'tasks', TaskViewSet)
 router.register(r'versions', VersionViewSet)
