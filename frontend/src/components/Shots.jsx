@@ -3,8 +3,6 @@ import api from '../api/client';
 
 export default function Shots({ projectId }) {
     const [shots, setShots] = useState([]);
-    const test_nums = [1, 3, 5];
-    console.log(shots);
 
     useEffect(() => {
         api.get(`shots/?project=${projectId}`).then((response) => {
