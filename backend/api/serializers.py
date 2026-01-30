@@ -25,8 +25,8 @@ class VersionSerializer(serializers.ModelSerializer):
 class ShotSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shot
-        fields = '__all__'
-        read_only_fields = ['id']
+        fields = ['id', 'project', 'name', 'description', 'frame_start', 'frame_end', 'status']
+        # read_only_fields = ['id']
 
 
 class TaskSerializer(serializers.ModelSerializer):

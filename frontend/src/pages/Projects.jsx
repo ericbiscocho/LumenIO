@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '../api/client';
 import CreateProject from '../components/CreateProject';
+import Shots from '../components/Shots';
 
 export default function Projects() {
     const [projects, setProjects] = useState([]);
@@ -17,7 +18,10 @@ export default function Projects() {
             <CreateProject onCreated={(project) => setProjects((prev) => [...prev, project])} />
             <ul>
                 {projects.map((project) => (
-                    <li key={project.id}>{project.name}</li>
+                    <div key={project.id}>
+                        <h4>{project.name}</h4>
+                        <Shots projectId={project.id} />
+                    </div>
                 ))}
             </ul>
         </div>
