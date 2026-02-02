@@ -25,6 +25,7 @@ class Shot(models.Model):
         ('not_started', 'Not Started'),
         ('in_progress', 'In Progress'),
         ('completed', 'Completed'),
+        ('approved', 'Approved'),
         ('on_hold', 'On Hold'),
     ]
     project = models.ForeignKey(Project, related_name='shots', on_delete=models.CASCADE)
