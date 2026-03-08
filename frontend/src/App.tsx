@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import Login from './pages/Login.jsx';
-import Projects from './pages/Projects.jsx';
+import Login from './pages/Login';
+import Projects from './pages/Projects';
 import { isAuthenticated, logout } from './auth/auth';
 
 function App() {
-  const [authed, setAuthed] = useState(isAuthenticated())
+  const [authed, setAuthed] = useState<boolean>(isAuthenticated());
 
   if (!authed) {
     return <Login onLogin={() => setAuthed(true)} />;

@@ -1,17 +1,21 @@
 import { useState } from 'react';
 import { login } from '../auth/auth';
 
-export default function Login({ onLogin }) {
+type LoginProps = {
+    onLogin: () => void;
+};
+
+export default function Login({ onLogin }: LoginProps) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
 
-    async function handleSubmit(event) {
+    async function handleSubmit(event: React.FormEvent) {
         event.preventDefault();
         try {
             await login(username, password);
             onLogin();
-        } catch (err) {
+        } catch {
             setError('Invalid username or password');
         }
     }
