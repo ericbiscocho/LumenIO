@@ -1,11 +1,16 @@
 import { useEffect, useState } from 'react';
 import api from '../api/client';
+import { Shot, ShotStatus, PaginatedResponse } from '../types/api';
 
-export default function Shots({ projectId }) {
-    const [shots, setShots] = useState([]);
+type ShotsProps = {
+    projectId: number;
+};
+
+export default function Shots({ projectId }: ShotsProps) {
+    const [shots, setShots] = useState<Shot[]>([]);
 
     useEffect(() => {
-        api.get(`shots/?project=${projectId}`).then((response) => {
+        api.get<PaginatedResponse<Shot>>(`shots/?project=${projectId}`).then((response) => {
             setShots(response.data.results);
         });
     }, [projectId]);
@@ -15,11 +20,11 @@ export default function Shots({ projectId }) {
             <h3>Shots</h3>
             <ul>
                 {shots.map((shot) => (
-                    <li style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <li key={shot.id} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <span>{shot.name}</span>
                         <select value={shot.status}
-                            onChange={async (e) => {
-                                const response = await api.patch(`shots/${shot.id}/`, { status: e.target.value });
+                            onChange={async (e: React.ChangeEvent<HTMLSelectElement>) => {
+                                const response = await api.patch(`shots/${shot.id}/`, { status: e.target.value as ShotStatus});
                                 setShots((prevStatus) => prevStatus.map((test) => test.id === shot.id ? response.data : test));
                             }}>
                             <option value='not_started'>Not Started</option>

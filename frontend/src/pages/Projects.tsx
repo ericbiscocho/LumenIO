@@ -2,14 +2,15 @@ import { useEffect, useState } from 'react';
 import api from '../api/client';
 import CreateProject from '../components/CreateProject';
 import Shots from '../components/Shots';
+import { Project, PaginatedResponse } from '../types/api';
 
 export default function Projects() {
-    const [projects, setProjects] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [projects, setProjects] = useState<Project[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        api.get('projects/')
+        api.get<PaginatedResponse<Project>>('projects/')
             .then((response) => setProjects(response.data.results))
             .catch((error) => {
                 console.error(error);
