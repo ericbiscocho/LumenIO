@@ -30,8 +30,15 @@ class ShotViewSet(viewsets.ModelViewSet):
 
 
 class TaskViewSet(viewsets.ModelViewSet):
-    queryset = Task.objects.all()
     serializer_class = TaskSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Task.objects.filter(shot__project__owner=self.request.user)
+        shot_id = self.request.query_params.get('shot')
+        if shot_id:
+            queryset = queryset.filter(shot_id=shot_id)
+        return queryset
 
 
 class VersionViewSet(viewsets.ModelViewSet):

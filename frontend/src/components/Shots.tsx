@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../api/client';
+import Tasks from '../components/Tasks';
 import { Shot, ShotStatus, PaginatedResponse } from '../types/api';
 
 type ShotsProps = {
@@ -17,7 +18,7 @@ export default function Shots({ projectId }: ShotsProps) {
 
     return (
         <div>
-            <h3>Shots</h3>
+            <h4>Shots</h4>
             <ul>
                 {shots.map((shot) => (
                     <li key={shot.id} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -34,6 +35,13 @@ export default function Shots({ projectId }: ShotsProps) {
                             <option value='on_hold'>On Hold</option>
                         </select>
                     </li>
+
+                ))}
+                <h4>Tasks</h4>
+                {shots.map((shot) => (
+                    <div key={shot.id}>
+                        <Tasks shotId={shot.id} />
+                    </div>
                 ))}
             </ul>
         </div>

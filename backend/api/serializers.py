@@ -22,19 +22,21 @@ class VersionSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class ShotSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Shot
-        fields = ['id', 'project', 'name', 'description', 'frame_start', 'frame_end', 'status']
-        # read_only_fields = ['id']
-
-
 class TaskSerializer(serializers.ModelSerializer):
-    shots = ShotSerializer(many=True, read_only=True)
+    #shots = ShotSerializer(many=True, read_only=True)
 
     class Meta:
         model = Task
-        fields = '__all__'
+        fields = ['id', 'shot', 'name', 'status']
+        read_only_fields = ['id']
+
+
+class ShotSerializer(serializers.ModelSerializer):
+    tasks = TaskSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Shot
+        fields = ['id', 'project', 'name', 'description', 'frame_start', 'frame_end', 'status', 'tasks']
         read_only_fields = ['id']
 
 
@@ -44,4 +46,4 @@ class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = ['id', 'name', 'created_at', 'updated_at', 'status', 'shots']
-        # read_only_fields = ['id', 'created_at']
+        read_only_fields = ['id', 'created_at']

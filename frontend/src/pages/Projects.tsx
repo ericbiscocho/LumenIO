@@ -30,7 +30,7 @@ export default function Projects() {
             <ul>
                 {projects.map((project) => (
                     <div key={project.id}>
-                        <h4>{project.name}</h4>
+                        <h3>{project.name}</h3>
                         <Shots projectId={project.id} />
                     </div>
                 ))}

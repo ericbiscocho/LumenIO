@@ -17,6 +17,19 @@ export type Shot = {
     project: number;
 };
 
+export type TaskStatus =
+    | 'todo'
+    | 'in_progress'
+    | 'review'
+    | 'done';
+
+export type Task = {
+    id: number;
+    name: string;
+    status: TaskStatus;
+    shot: number;
+}
+
 export type PaginatedResponse<T> = {
     results: T[];
     count: number;
