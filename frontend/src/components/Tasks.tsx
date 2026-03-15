@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../api/client';
-import { Task, TaskStatus, PaginatedResponse } from '../types/api';
+import type { Task, TaskStatus, PaginatedResponse } from '../types/api';
 
 type TasksProps = {
     shotId: number;
@@ -24,13 +24,13 @@ export default function Tasks({ shotId }: TasksProps) {
             <select
                 value={task.status}
                 onChange={async (e: React.ChangeEvent<HTMLSelectElement>) => {
-                const response = await api.patch(`tasks/${task.id}/`, {
+                const response = await api.patch<Task>(`tasks/${task.id}/`, {
                     status: e.target.value as TaskStatus,
                 });
 
-                setTasks((prev) =>
-                    prev.map((task) =>
-                    task.id === task.id ? response.data : task
+                setTasks((prevStatus) =>
+                    prevStatus.map((taskStatus) =>
+                    taskStatus.id === task.id ? response.data : taskStatus
                     )
                 );
                 }}

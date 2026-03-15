@@ -13,7 +13,7 @@ export default function CreateProject({ onCreated }: CreateProjectProps) {
         e.preventDefault();
         if (!name.trim()) return;
 
-        const response = await api.post('projects/', { name });
+        const response = await api.post<Project>('projects/', { name });
         onCreated(response.data);
         setName('');
     };

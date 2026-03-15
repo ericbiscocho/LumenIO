@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '../api/client';
 import Tasks from '../components/Tasks';
-import { Shot, ShotStatus, PaginatedResponse } from '../types/api';
+import type { Shot, ShotStatus, PaginatedResponse } from '../types/api';
 
 type ShotsProps = {
     projectId: number;
@@ -25,8 +25,8 @@ export default function Shots({ projectId }: ShotsProps) {
                         <span>{shot.name}</span>
                         <select value={shot.status}
                             onChange={async (e: React.ChangeEvent<HTMLSelectElement>) => {
-                                const response = await api.patch(`shots/${shot.id}/`, { status: e.target.value as ShotStatus});
-                                setShots((prevStatus) => prevStatus.map((test) => test.id === shot.id ? response.data : test));
+                                const response = await api.patch<Shot>(`shots/${shot.id}/`, { status: e.target.value as ShotStatus});
+                                setShots((prevStatus) => prevStatus.map((status) => status.id === shot.id ? response.data : status));
                             }}>
                             <option value='not_started'>Not Started</option>
                             <option value='in_progress'>In Progress</option>
@@ -37,13 +37,13 @@ export default function Shots({ projectId }: ShotsProps) {
                     </li>
 
                 ))}
-                <h4>Tasks</h4>
-                {shots.map((shot) => (
-                    <div key={shot.id}>
-                        <Tasks shotId={shot.id} />
-                    </div>
-                ))}
             </ul>
+            <h4>Tasks</h4>
+            {shots.map((shot) => (
+                <div key={shot.id}>
+                    <Tasks shotId={shot.id} />
+                </div>
+            ))}
         </div>
     );
 };
