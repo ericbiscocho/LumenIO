@@ -1,0 +1,68 @@
+name: Test
+
+on: [pull_request, push]
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: lumenio
+          POSTGRES_USER: lumenio
+          POSTGRES_PASSWORD: test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - uses: actions/setup-python@v5.6.0
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run migrations
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: lumenio
+          DB_USER: lumenio
+          DB_PASSWORD: test
+          DJANGO_SETTINGS_MODULE: backend.settings
+          DJANGO_SECRET_KEY: ci-secret-key-not-used-in-production
+        run: python backend/manage.py migrate
+
+      - name: Run tests
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: lumenio
+          DB_USER: lumenio
+          DB_PASSWORD: test
+          DJANGO_SETTINGS_MODULE: backend.settings
+          DJANGO_SECRET_KEY: ci-secret-key-not-used-in-production
+        run: pytest backend/api/tests/
+
+      - uses: actions/setup-node@v4.4.0
+        with:
+          node-version: "20"
+
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: frontend
+
+      - name: Build frontend
+        run: npm run build
+        working-directory: frontend

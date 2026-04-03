@@ -1,0 +1,44 @@
+name: Deploy
+
+on:
+  push:
+    branches: [feature/github-actions-ci-cd]
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  AWS_REGION: us-east-1
+  BACKEND_ECR_REPO: lumenio-backend
+  FRONTEND_ECR_REPO: lumenio-frontend
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4.1.0
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push backend
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          TAG: ${{ github.sha }}
+        run: |
+          docker build -f backend/Dockerfile.backend -t $REGISTRY/$BACKEND_ECR_REPO:$TAG .
+          docker push $REGISTRY/$BACKEND_ECR_REPO:$TAG
+
+      - name: Build and push frontend
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          TAG: ${{ github.sha }}
+        run: |
+          docker build -f frontend/Dockerfile.frontend -t $REGISTRY/$FRONTEND_ECR_REPO:$TAG .
+          docker push $REGISTRY/$FRONTEND_ECR_REPO:$TAG
