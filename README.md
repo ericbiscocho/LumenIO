@@ -5,7 +5,6 @@ A full-stack VFX shot tracking and production management tool. LumenIO lets team
 ---
 
 ## Architecture
-
 ```
 ┌─────────────────────┐        HTTP/REST        ┌──────────────────────┐
 │   React + Vite      │ ──────────────────────► │   Django REST API    │
@@ -45,6 +44,36 @@ A full-stack VFX shot tracking and production management tool. LumenIO lets team
 | Backend | Django 6, Django REST Framework |
 | Auth | SimpleJWT |
 | Database | PostgreSQL |
+| Containerization | Docker, Docker Compose |
+| CI/CD | GitHub Actions |
+| Image registry | Amazon ECR |
+| Static files | Whitenoise, nginx |
+
+---
+
+## Infrastructure & CI/CD
+
+LumenIO is fully containerized and deployed via an automated CI/CD pipeline.
+
+**Containers** — the backend and frontend each have a multi-stage `Dockerfile`. The backend uses a builder stage to install Python dependencies, then copies only the necessary artifacts into a lean runtime image. The frontend builds the React app with Node, then serves the static output from nginx.
+
+**Local development** — `docker-compose.yml` runs all three services (PostgreSQL, Django, React) together with a single command:
+```bash
+docker compose up --build
+```
+
+**CI pipeline** (`test.yml`) — runs on every push and pull request:
+- Spins up a PostgreSQL service container
+- Installs Python dependencies and runs Django migrations
+- Runs the pytest suite against the live database
+- Installs frontend dependencies and verifies the production build
+
+**Deploy pipeline** (`deploy.yml`) — runs on every merge to `main`:
+- Authenticates with AWS via GitHub Actions secrets
+- Builds both Docker images using multi-stage builds
+- Pushes versioned images to Amazon ECR, tagged with the commit SHA
+
+This mirrors the Jenkins-based CI/CD patterns common in larger engineering organizations — the GitHub Actions workflows are structured as direct analogs to declarative Jenkins pipelines.
 
 ---
 
@@ -54,25 +83,32 @@ A full-stack VFX shot tracking and production management tool. LumenIO lets team
 
 - Python 3.13+
 - Node.js 18+
-- PostgreSQL
+- PostgreSQL (or Docker)
 
-### Backend
+### With Docker (recommended)
+```bash
+docker compose up --build
+```
 
+The API will be available at `http://localhost:8000` and the frontend at `http://localhost:5173`.
+
+### Without Docker
+
+#### Backend
 ```bash
 python -m venv .venv
 source .venv/bin/activate       # macOS/Linux
 .venv\Scripts\activate          # Windows
 
 pip install -r requirements.txt
-python manage.py migrate
-python manage.py runserver
+python backend/manage.py migrate
+python backend/manage.py runserver
 ```
 
-### Frontend
-
+#### Frontend
 ```bash
 cd frontend
-cp .env.example .env            # add your API base URL
+cp src/.env.example src/.env    # add your API base URL
 npm install
 npm run dev
 ```
@@ -80,7 +116,6 @@ npm run dev
 ### Environment Variables
 
 Create `frontend/.env` from the provided `.env.example`:
-
 ```
 VITE_API_BASE_URL=http://localhost:8000/api/
 ```
@@ -88,23 +123,31 @@ VITE_API_BASE_URL=http://localhost:8000/api/
 ---
 
 ## Project Structure
-
 ```
 LumenIO/
+├── .github/
+│   └── workflows/
+│       ├── test.yml            # CI — runs on every push/PR
+│       └── deploy.yml          # CD — builds and pushes images to ECR on merge to main
 ├── backend/
+│   ├── Dockerfile.backend
 │   ├── manage.py
-│   ├── backend/
-│   └── ...
-└── frontend/
+│   ├── backend/               # Django project settings
+│   └── api/                   # Models, views, serializers, tests
+├── frontend/
+│   ├── Dockerfile.frontend
+│   ├── nginx.conf
 │   ├── src/
-│   │   ├── api/          # Axios client instance
-│   │   ├── auth/         # JWT login/logout helpers
-│   │   ├── components/   # CreateProject, Shots, Tasks
-│   │   ├── pages/        # Login, Projects
-│   │   ├── types/        # Shared TypeScript types
+│   │   ├── api/               # Axios client instance
+│   │   ├── auth/              # JWT login/logout helpers
+│   │   ├── components/        # CreateProject, Shots, Tasks
+│   │   ├── pages/             # Login, Projects
+│   │   ├── types/             # Shared TypeScript types
 │   │   ├── App.tsx
 │   │   └── main.tsx
 │   ├── tsconfig.json
 │   └── vite.config.ts
+├── docker-compose.yml
+├── pytest.ini
 └── requirements.txt
 ```
