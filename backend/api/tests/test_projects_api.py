@@ -1,5 +1,6 @@
 import os
 import django
+import pytest
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
 django.setup()
@@ -9,6 +10,7 @@ from rest_framework.test import APIClient
 from api.models import Project
 
 
+@pytest.mark.django_db
 def test_user_only_sees_own_projects():
     """
     Ensures authenticated users cannot see projects owned by other users (multi-tenant safety).
